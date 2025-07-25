@@ -1,0 +1,54 @@
+{
+  "name": "genifydesigns",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered print-on-demand platform where anyone can turn their ideas into unique, wearable, giftable, or display-worthy designs instantly.",
+  "keywords": ["ai", "print-on-demand", "ecommerce", "nextjs", "react", "stripe", "firebase"],
+  "author": "GenifyDesigns",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/genifydesigns.git"
+  },
+  "homepage": "https://genifydesigns.store",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "export": "next build && next export",
+    "deploy": "npm run build && vercel --prod"
+  },
+  "dependencies": {
+    "next": "14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@stripe/stripe-js": "^2.1.0",
+    "stripe": "^14.0.0",
+    "firebase": "^10.7.0",
+    "axios": "^1.6.0",
+    "react-hot-toast": "^2.4.1",
+    "lucide-react": "^0.292.0",
+    "framer-motion": "^10.16.0",
+    "react-dropzone": "^14.2.3",
+    "react-image-crop": "^10.1.8",
+    "react-colorful": "^5.6.1",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.52.0",
+    "eslint-config-next": "14.0.0",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+} 
