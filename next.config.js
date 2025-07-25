@@ -15,13 +15,13 @@ const nextConfig = {
         tls: false,
       };
     }
-    
+
     // Handle undici compatibility
     config.externals = config.externals || [];
     config.externals.push({
       'undici': 'commonjs undici',
     });
-    
+
     return config;
   },
   experimental: {
