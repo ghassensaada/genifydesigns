@@ -8,7 +8,7 @@ const products = [
     id: 'tshirt',
     name: 'Premium Cotton T-Shirt',
     price: '$24.95',
-    image: '/images/tshirt-product.jpg',
+    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop&crop=center',
     description: 'High-quality 100% cotton t-shirt with your custom design',
     features: ['100% Cotton', 'Multiple sizes', 'Machine washable', 'Custom fit'],
     colors: ['White', 'Black', 'Navy', 'Gray', 'Red', 'Green'],
@@ -18,7 +18,7 @@ const products = [
     id: 'hoodie',
     name: 'Comfortable Hoodie',
     price: '$39.95',
-    image: '/images/hoodie-product.jpg',
+    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop&crop=center',
     description: 'Warm and cozy hoodie perfect for any season',
     features: ['Fleece lining', 'Kangaroo pocket', 'Adjustable drawstring', 'Durable'],
     colors: ['Black', 'Gray', 'Navy', 'Burgundy', 'Olive'],
@@ -28,7 +28,7 @@ const products = [
     id: 'mug',
     name: 'Ceramic Coffee Mug',
     price: '$14.95',
-    image: '/images/mug-product.jpg',
+    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop&crop=center',
     description: 'Perfect for your morning coffee with a personal touch',
     features: ['Microwave safe', 'Dishwasher safe', '11oz capacity', 'Lead-free'],
     colors: ['White', 'Black', 'Red', 'Blue', 'Green']
@@ -37,7 +37,7 @@ const products = [
     id: 'poster',
     name: 'High-Quality Poster',
     price: '$19.95',
-    image: '/images/poster-product.jpg',
+    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=center',
     description: 'Vibrant prints perfect for home or office decoration',
     features: ['Premium paper', 'Fade resistant', 'Multiple sizes', 'Ready to frame'],
     sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
@@ -46,7 +46,7 @@ const products = [
     id: 'canvas',
     name: 'Gallery Canvas Print',
     price: '$29.95',
-    image: '/images/canvas-product.jpg',
+    image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop&crop=center',
     description: 'Museum-quality canvas prints that last a lifetime',
     features: ['Gallery wrapped', 'UV resistant', 'Archival quality', 'Ready to hang'],
     sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
@@ -55,7 +55,7 @@ const products = [
     id: 'sticker',
     name: 'Vinyl Stickers',
     price: '$4.95',
-    image: '/images/sticker-product.jpg',
+    image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop&crop=center',
     description: 'Durable vinyl stickers for laptops, water bottles, and more',
     features: ['Weather resistant', 'Easy to apply', 'Removable', 'Long lasting'],
     sizes: ['2" x 2"', '3" x 3"', '4" x 4"', '5" x 5"']

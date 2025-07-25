@@ -10,7 +10,7 @@ const products = [
     id: 'tshirt',
     name: 'T-Shirt',
     price: '$24.95',
-    image: '/images/tshirt-mockup.jpg',
+    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop&crop=center',
     colors: ['White', 'Black', 'Navy', 'Gray', 'Red', 'Green'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
   },
@@ -18,7 +18,7 @@ const products = [
     id: 'hoodie',
     name: 'Hoodie',
     price: '$39.95',
-    image: '/images/hoodie-mockup.jpg',
+    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop&crop=center',
     colors: ['Black', 'Gray', 'Navy', 'Burgundy', 'Olive'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
   },
@@ -26,28 +26,28 @@ const products = [
     id: 'mug',
     name: 'Mug',
     price: '$14.95',
-    image: '/images/mug-mockup.jpg',
+    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop&crop=center',
     colors: ['White', 'Black', 'Red', 'Blue', 'Green']
   },
   {
     id: 'poster',
     name: 'Poster',
     price: '$19.95',
-    image: '/images/poster-mockup.jpg',
+    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=center',
     sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
   },
   {
     id: 'canvas',
     name: 'Canvas Print',
     price: '$29.95',
-    image: '/images/canvas-mockup.jpg',
+    image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop&crop=center',
     sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
   },
   {
     id: 'sticker',
     name: 'Sticker',
     price: '$4.95',
-    image: '/images/sticker-mockup.jpg',
+    image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop&crop=center',
     sizes: ['2" x 2"', '3" x 3"', '4" x 4"', '5" x 5"']
   }
 ]
@@ -111,7 +111,7 @@ export default function CreatePage() {
 
   const getMockupImage = () => {
     if (!generatedImage) {
-      return '/images/placeholder-mockup.jpg'
+      return 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center'
     }
     
     // In a real implementation, you would overlay the generated design on the product mockup
