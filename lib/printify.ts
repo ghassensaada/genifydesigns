@@ -10,6 +10,11 @@ export interface PrintifyProduct {
   variants: PrintifyVariant[]
   options: PrintifyOption[]
   is_enabled: boolean
+  tags: string[]
+  is_locked: boolean
+  print_provider_id: number
+  print_areas: PrintArea[]
+  sales_channel_properties: any[]
 }
 
 export interface PrintifyVariant {
@@ -20,6 +25,7 @@ export interface PrintifyVariant {
     value: string
   }[]
   placeholders: PrintifyPlaceholder[]
+  is_enabled: boolean
 }
 
 export interface PrintifyOption {
@@ -28,6 +34,8 @@ export interface PrintifyOption {
   type: string
   values: {
     id: number
+    title: string
+    colors?: string[]
   }[]
 }
 
@@ -40,14 +48,45 @@ export interface PrintifyPlaceholder {
   }[]
 }
 
+export interface PrintArea {
+  variant_ids: number[]
+  placeholders: {
+    position: string
+    images: {
+      id: number
+      name: string
+      src: string
+    }[]
+  }[]
+}
+
 export interface PrintifyShop {
   id: string
   title: string
   sales_channel: string
 }
 
-// Fetch all available products from Printify
-export async function getPrintifyProducts(): Promise<PrintifyProduct[]> {
+export interface CatalogProduct {
+  id: string
+  title: string
+  description: string
+  brand: string
+  model: string
+  images: string[]
+  variants: PrintifyVariant[]
+  options: PrintifyOption[]
+  is_enabled: boolean
+  tags: string[]
+  print_provider_id: number
+  print_areas: PrintArea[]
+  pricing: {
+    base: number
+    currency: string
+  }
+}
+
+// Fetch all available products from Printify catalog
+export async function getPrintifyCatalog(): Promise<CatalogProduct[]> {
   try {
     const response = await fetch(`${PRINTIFY_API_BASE}/catalog/products.json`, {
       headers: {
@@ -63,9 +102,9 @@ export async function getPrintifyProducts(): Promise<PrintifyProduct[]> {
     const data = await response.json()
     return data.data || []
   } catch (error) {
-    console.error('Error fetching Printify products:', error)
-    // Return mock data if API is not available
-    return getMockPrintifyProducts()
+    console.error('Error fetching Printify catalog:', error)
+    // Return mock catalog data if API is not available
+    return getMockCatalogProducts()
   }
 }
 
@@ -91,8 +130,30 @@ export async function getPrintifyProduct(productId: string): Promise<PrintifyPro
   }
 }
 
-// Mock data for development/testing
-function getMockPrintifyProducts(): PrintifyProduct[] {
+// Get print providers for better product categorization
+export async function getPrintProviders(): Promise<any[]> {
+  try {
+    const response = await fetch(`${PRINTIFY_API_BASE}/print_providers.json`, {
+      headers: {
+        'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`Printify API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.data || []
+  } catch (error) {
+    console.error('Error fetching print providers:', error)
+    return []
+  }
+}
+
+// Mock catalog data for development/testing
+function getMockCatalogProducts(): CatalogProduct[] {
   return [
     {
       id: '1',
@@ -136,7 +197,8 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
                 }
               ]
             }
-          ]
+          ],
+          is_enabled: true
         }
       ],
       options: [
@@ -145,12 +207,12 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Size',
           type: 'select',
           values: [
-            { id: 1 }, // XS
-            { id: 2 }, // S
-            { id: 3 }, // M
-            { id: 4 }, // L
-            { id: 5 }, // XL
-            { id: 6 }  // XXL
+            { id: 1, title: 'XS' },
+            { id: 2, title: 'S' },
+            { id: 3, title: 'M' },
+            { id: 4, title: 'L' },
+            { id: 5, title: 'XL' },
+            { id: 6, title: 'XXL' }
           ]
         },
         {
@@ -158,16 +220,46 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Color',
           type: 'select',
           values: [
-            { id: 1 }, // White
-            { id: 2 }, // Black
-            { id: 3 }, // Navy
-            { id: 4 }, // Gray
-            { id: 5 }, // Red
-            { id: 6 }  // Green
+            { id: 1, title: 'White' },
+            { id: 2, title: 'Black' },
+            { id: 3, title: 'Navy' },
+            { id: 4, title: 'Gray' },
+            { id: 5, title: 'Red' },
+            { id: 6, title: 'Green' }
           ]
         }
       ],
-      is_enabled: true
+      is_enabled: true,
+      tags: ['clothing', 't-shirt', 'cotton'],
+      print_provider_id: 1,
+      print_areas: [
+        {
+          variant_ids: [1],
+          placeholders: [
+            {
+              position: 'front',
+              images: [
+                {
+                  id: 1,
+                  name: 'Front View',
+                  src: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            },
+            {
+              position: 'back',
+              images: [
+                {
+                  id: 2,
+                  name: 'Back View',
+                  src: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      pricing: { base: 24.95, currency: 'USD' }
     },
     {
       id: '2',
@@ -210,7 +302,8 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
                 }
               ]
             }
-          ]
+          ],
+          is_enabled: true
         }
       ],
       options: [
@@ -219,11 +312,11 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Size',
           type: 'select',
           values: [
-            { id: 1 }, // S
-            { id: 2 }, // M
-            { id: 3 }, // L
-            { id: 4 }, // XL
-            { id: 5 }  // XXL
+            { id: 1, title: 'S' },
+            { id: 2, title: 'M' },
+            { id: 3, title: 'L' },
+            { id: 4, title: 'XL' },
+            { id: 5, title: 'XXL' }
           ]
         },
         {
@@ -231,15 +324,45 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Color',
           type: 'select',
           values: [
-            { id: 1 }, // Black
-            { id: 2 }, // Gray
-            { id: 3 }, // Navy
-            { id: 4 }, // Burgundy
-            { id: 5 }  // Olive
+            { id: 1, title: 'Black' },
+            { id: 2, title: 'Gray' },
+            { id: 3, title: 'Navy' },
+            { id: 4, title: 'Burgundy' },
+            { id: 5, title: 'Olive' }
           ]
         }
       ],
-      is_enabled: true
+      is_enabled: true,
+      tags: ['clothing', 'hoodie', 'fleece'],
+      print_provider_id: 1,
+      print_areas: [
+        {
+          variant_ids: [2],
+          placeholders: [
+            {
+              position: 'front',
+              images: [
+                {
+                  id: 1,
+                  name: 'Front View',
+                  src: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            },
+            {
+              position: 'back',
+              images: [
+                {
+                  id: 2,
+                  name: 'Back View',
+                  src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      pricing: { base: 39.95, currency: 'USD' }
     },
     {
       id: '3',
@@ -272,7 +395,8 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
                 }
               ]
             }
-          ]
+          ],
+          is_enabled: true
         }
       ],
       options: [
@@ -281,15 +405,35 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Color',
           type: 'select',
           values: [
-            { id: 1 }, // White
-            { id: 2 }, // Black
-            { id: 3 }, // Red
-            { id: 4 }, // Blue
-            { id: 5 }  // Green
+            { id: 1, title: 'White' },
+            { id: 2, title: 'Black' },
+            { id: 3, title: 'Red' },
+            { id: 4, title: 'Blue' },
+            { id: 5, title: 'Green' }
           ]
         }
       ],
-      is_enabled: true
+      is_enabled: true,
+      tags: ['home', 'mug', 'ceramic'],
+      print_provider_id: 2,
+      print_areas: [
+        {
+          variant_ids: [3],
+          placeholders: [
+            {
+              position: 'front',
+              images: [
+                {
+                  id: 1,
+                  name: 'Front View',
+                  src: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      pricing: { base: 14.95, currency: 'USD' }
     },
     {
       id: '4',
@@ -318,7 +462,8 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
                 }
               ]
             }
-          ]
+          ],
+          is_enabled: true
         }
       ],
       options: [
@@ -327,15 +472,35 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Size',
           type: 'select',
           values: [
-            { id: 1 }, // 8" x 10"
-            { id: 2 }, // 11" x 14"
-            { id: 3 }, // 16" x 20"
-            { id: 4 }, // 18" x 24"
-            { id: 5 }  // 24" x 36"
+            { id: 1, title: '8" x 10"' },
+            { id: 2, title: '11" x 14"' },
+            { id: 3, title: '16" x 20"' },
+            { id: 4, title: '18" x 24"' },
+            { id: 5, title: '24" x 36"' }
           ]
         }
       ],
-      is_enabled: true
+      is_enabled: true,
+      tags: ['home', 'poster', 'print'],
+      print_provider_id: 3,
+      print_areas: [
+        {
+          variant_ids: [4],
+          placeholders: [
+            {
+              position: 'front',
+              images: [
+                {
+                  id: 1,
+                  name: 'Front View',
+                  src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      pricing: { base: 19.95, currency: 'USD' }
     },
     {
       id: '5',
@@ -364,7 +529,8 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
                 }
               ]
             }
-          ]
+          ],
+          is_enabled: true
         }
       ],
       options: [
@@ -373,15 +539,35 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Size',
           type: 'select',
           values: [
-            { id: 1 }, // 8" x 10"
-            { id: 2 }, // 11" x 14"
-            { id: 3 }, // 16" x 20"
-            { id: 4 }, // 18" x 24"
-            { id: 5 }  // 24" x 36"
+            { id: 1, title: '8" x 10"' },
+            { id: 2, title: '11" x 14"' },
+            { id: 3, title: '16" x 20"' },
+            { id: 4, title: '18" x 24"' },
+            { id: 5, title: '24" x 36"' }
           ]
         }
       ],
-      is_enabled: true
+      is_enabled: true,
+      tags: ['home', 'canvas', 'art'],
+      print_provider_id: 3,
+      print_areas: [
+        {
+          variant_ids: [5],
+          placeholders: [
+            {
+              position: 'front',
+              images: [
+                {
+                  id: 1,
+                  name: 'Front View',
+                  src: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      pricing: { base: 29.95, currency: 'USD' }
     },
     {
       id: '6',
@@ -410,7 +596,8 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
                 }
               ]
             }
-          ]
+          ],
+          is_enabled: true
         }
       ],
       options: [
@@ -419,19 +606,39 @@ function getMockPrintifyProducts(): PrintifyProduct[] {
           name: 'Size',
           type: 'select',
           values: [
-            { id: 1 }, // 2" x 2"
-            { id: 2 }, // 3" x 3"
-            { id: 3 }, // 4" x 4"
-            { id: 4 }  // 5" x 5"
+            { id: 1, title: '2" x 2"' },
+            { id: 2, title: '3" x 3"' },
+            { id: 3, title: '4" x 4"' },
+            { id: 4, title: '5" x 5"' }
           ]
         }
       ],
-      is_enabled: true
+      is_enabled: true,
+      tags: ['accessories', 'stickers', 'vinyl'],
+      print_provider_id: 4,
+      print_areas: [
+        {
+          variant_ids: [6],
+          placeholders: [
+            {
+              position: 'front',
+              images: [
+                {
+                  id: 1,
+                  name: 'Front View',
+                  src: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop&crop=center'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      pricing: { base: 4.95, currency: 'USD' }
     }
   ]
 }
 
-// Get product pricing (mock for now)
+// Get product pricing
 export function getProductPricing(productId: string): { base: number, currency: string } {
   const pricing: Record<string, { base: number, currency: string }> = {
     '1': { base: 24.95, currency: 'USD' }, // T-Shirt
@@ -443,4 +650,10 @@ export function getProductPricing(productId: string): { base: number, currency: 
   }
   
   return pricing[productId] || { base: 19.95, currency: 'USD' }
+}
+
+// Legacy function for backward compatibility
+export async function getPrintifyProducts(): Promise<PrintifyProduct[]> {
+  const catalogProducts = await getPrintifyCatalog()
+  return catalogProducts as unknown as PrintifyProduct[]
 } 

@@ -23,6 +23,9 @@ export default function HomePage() {
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
+                <Link href="/catalog" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Catalog
+                </Link>
                 <Link href="/create" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Create Design
                 </Link>
@@ -35,8 +38,8 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/create" className="btn-primary">
-                Start Creating
+              <Link href="/catalog" className="btn-primary">
+                Browse Catalog
               </Link>
             </div>
           </div>
@@ -65,14 +68,14 @@ export default function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Link href="/create" className="btn-primary text-lg px-8 py-4 flex items-center">
-                Start Creating Now
+              <Link href="/catalog" className="btn-primary text-lg px-8 py-4 flex items-center">
+                Browse Catalog
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-              <button className="btn-secondary text-lg px-8 py-4 flex items-center">
-                <Zap className="mr-2 w-5 h-5" />
-                Watch Demo
-              </button>
+              <Link href="/create" className="btn-secondary text-lg px-8 py-4 flex items-center">
+                <Wand2 className="mr-2 w-5 h-5" />
+                Start Creating
+              </Link>
             </div>
             
             <div className="flex items-center justify-center space-x-8 text-sm text-gray-500">

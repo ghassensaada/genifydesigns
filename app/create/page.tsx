@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Wand2, Palette, Ruler, Eye, EyeOff } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { ArrowLeft, Wand2, Palette, Ruler, Eye, EyeOff, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { getPrintifyProducts, getProductPricing, type PrintifyProduct } from '@/lib/printify'
+import { getPrintifyCatalog, getPrintifyProduct, type CatalogProduct } from '@/lib/printify'
 
 const suggestedPrompts = [
   'A flamingo DJ in retro style',
@@ -18,9 +19,13 @@ const suggestedPrompts = [
 ]
 
 export default function CreatePage() {
+  const searchParams = useSearchParams()
+  const initialProductId = searchParams.get('product')
+  
+  const [step, setStep] = useState<'product' | 'design'>('product')
   const [prompt, setPrompt] = useState('')
-  const [products, setProducts] = useState<PrintifyProduct[]>([])
-  const [selectedProduct, setSelectedProduct] = useState<PrintifyProduct | null>(null)
+  const [products, setProducts] = useState<CatalogProduct[]>([])
+  const [selectedProduct, setSelectedProduct] = useState<CatalogProduct | null>(null)
   const [selectedVariant, setSelectedVariant] = useState<any>(null)
   const [selectedOptions, setSelectedOptions] = useState<Record<string, any>>({})
   const [selectedMockupView, setSelectedMockupView] = useState('front')
@@ -32,14 +37,20 @@ export default function CreatePage() {
     loadProducts()
   }, [])
 
+  useEffect(() => {
+    if (initialProductId && products.length > 0) {
+      const product = products.find(p => p.id === initialProductId)
+      if (product) {
+        handleProductSelect(product)
+        setStep('design')
+      }
+    }
+  }, [initialProductId, products])
+
   const loadProducts = async () => {
     try {
-      const printifyProducts = await getPrintifyProducts()
-      setProducts(printifyProducts)
-      if (printifyProducts.length > 0) {
-        setSelectedProduct(printifyProducts[0])
-        setSelectedVariant(printifyProducts[0].variants[0])
-      }
+      const catalogProducts = await getPrintifyCatalog()
+      setProducts(catalogProducts)
     } catch (error) {
       console.error('Error loading products:', error)
       toast.error('Failed to load products')
@@ -80,11 +91,12 @@ export default function CreatePage() {
     }
   }
 
-  const handleProductSelect = (product: PrintifyProduct) => {
+  const handleProductSelect = (product: CatalogProduct) => {
     setSelectedProduct(product)
     setSelectedVariant(product.variants[0])
     setSelectedOptions({})
     setSelectedMockupView('front')
+    setStep('design')
   }
 
   const handleOptionChange = (optionName: string, value: any) => {
@@ -92,19 +104,6 @@ export default function CreatePage() {
       ...prev,
       [optionName]: value
     }))
-  }
-
-  const getMockupImage = () => {
-    if (!selectedProduct || !selectedVariant) {
-      return 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center'
-    }
-    
-    const placeholder = selectedVariant.placeholders.find((p: any) => p.position === selectedMockupView)
-    if (placeholder && placeholder.images.length > 0) {
-      return placeholder.images[0].src
-    }
-    
-    return selectedProduct.images[0] || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center'
   }
 
   const getMockupDisplay = () => {
@@ -133,8 +132,21 @@ export default function CreatePage() {
 
   const getProductPrice = () => {
     if (!selectedProduct) return '$0.00'
-    const pricing = getProductPricing(selectedProduct.id)
-    return `$${pricing.base.toFixed(2)}`
+    return `$${selectedProduct.pricing.base.toFixed(2)}`
+  }
+
+  const getProductFeatures = (product: CatalogProduct) => {
+    const features: string[] = []
+    
+    if (product.tags.includes('clothing')) {
+      features.push('Premium fabric', 'Multiple sizes', 'Custom fit')
+    } else if (product.tags.includes('home')) {
+      features.push('High quality', 'Durable', 'Beautiful design')
+    } else if (product.tags.includes('accessories')) {
+      features.push('Weather resistant', 'Easy to apply', 'Long lasting')
+    }
+    
+    return features
   }
 
   if (isLoading) {
@@ -182,254 +194,335 @@ export default function CreatePage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Create Your Design</h1>
-          <p className="text-xl text-gray-600">Describe your vision and watch AI bring it to life</p>
+        {/* Step Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-center space-x-4">
+            <div className={`flex items-center space-x-2 ${step === 'product' ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'product' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                1
+              </div>
+              <span className="font-medium">Select Product</span>
+            </div>
+            <div className="w-8 h-1 bg-gray-200 rounded"></div>
+            <div className={`flex items-center space-x-2 ${step === 'design' ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'design' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                2
+              </div>
+              <span className="font-medium">Create Design</span>
+            </div>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column - Input and Product Selection */}
-          <div className="space-y-8">
-            {/* Describe Your Vision */}
-            <div className="card">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Describe Your Vision</h2>
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g., A flamingo DJ in retro style, cosmic cats playing chess, robot gardener tending to digital flowers..."
-                className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-              />
-              
-              {/* Suggested Prompts */}
-              <div className="mt-4">
-                <p className="text-sm text-gray-600 mb-2">Try these prompts:</p>
-                <div className="flex flex-wrap gap-2">
-                  {suggestedPrompts.map((suggestedPrompt) => (
-                    <button
-                      key={suggestedPrompt}
-                      onClick={() => setPrompt(suggestedPrompt)}
-                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm transition-colors"
-                    >
-                      {suggestedPrompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="mt-4 w-full btn-primary flex items-center justify-center"
-              >
-                {isGenerating ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="w-5 h-5 mr-2" />
-                    Generate Design
-                  </>
-                )}
-              </button>
+        {step === 'product' ? (
+          /* Product Selection Step */
+          <div>
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Choose Your Product</h1>
+              <p className="text-xl text-gray-600">Select the perfect canvas for your design</p>
             </div>
 
-            {/* Choose Your Product */}
-            <div className="card">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Choose Your Product</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {products.map((product) => (
-                  <div
-                    key={product.id}
-                    onClick={() => handleProductSelect(product)}
-                    className={`card cursor-pointer transition-all hover:shadow-lg ${
-                      selectedProduct?.id === product.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                    }`}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => handleProductSelect(product)}
+                  className="card cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+                >
+                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+                    <img
+                      src={product.images[0]}
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement
+                        target.style.display = 'none'
+                        const nextElement = target.nextElementSibling as HTMLElement
+                        if (nextElement) {
+                          nextElement.style.display = 'flex'
+                        }
+                      }}
+                    />
+                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl" style={{display: 'none'}}>
+                      {product.title.charAt(0)}
+                    </div>
+                  </div>
+                  
+                  <h3 className="font-semibold text-gray-900 text-lg mb-2">{product.title}</h3>
+                  <p className="text-gray-600 text-sm mb-3">{product.description}</p>
+                  
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xl font-bold text-blue-600">${product.pricing.base.toFixed(2)}</span>
+                    <div className="flex items-center text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                      <span className="text-gray-600 text-sm ml-1">(4.9)</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-1">
+                      {getProductFeatures(product).map((feature) => (
+                        <span key={feature} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-center text-blue-600 font-medium">
+                    <span>Select Product</span>
+                    <ArrowLeft className="w-4 h-4 ml-1 rotate-180" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Design Creation Step */
+          <div>
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Create Your Design</h1>
+              <p className="text-xl text-gray-600">Describe your vision and watch AI bring it to life</p>
+            </div>
+
+            {/* Selected Product Info */}
+            {selectedProduct && (
+              <div className="card mb-8">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                    <img
+                      src={selectedProduct.images[0]}
+                      alt={selectedProduct.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 text-lg">{selectedProduct.title}</h3>
+                    <p className="text-gray-600">{selectedProduct.description}</p>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <span className="text-lg font-bold text-blue-600">${selectedProduct.pricing.base.toFixed(2)}</span>
+                      <button
+                        onClick={() => setStep('product')}
+                        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      >
+                        Change Product
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Left Column - Input and Product Options */}
+              <div className="space-y-8">
+                {/* Describe Your Vision */}
+                <div className="card">
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Describe Your Vision</h2>
+                  <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="e.g., A flamingo DJ in retro style, cosmic cats playing chess, robot gardener tending to digital flowers..."
+                    className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  />
+
+                  {/* Suggested Prompts */}
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-600 mb-2">Try these prompts:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {suggestedPrompts.map((suggestedPrompt) => (
+                        <button
+                          key={suggestedPrompt}
+                          onClick={() => setPrompt(suggestedPrompt)}
+                          className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm transition-colors"
+                        >
+                          {suggestedPrompt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="mt-4 w-full btn-primary flex items-center justify-center"
                   >
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.title}
-                        className="w-12 h-12 object-cover rounded"
-                        onError={(e) => {
-                          const target = e.currentTarget as HTMLImageElement
-                          target.style.display = 'none'
-                          const nextElement = target.nextElementSibling as HTMLElement
-                          if (nextElement) {
-                            nextElement.style.display = 'block'
-                          }
-                        }}
-                      />
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded flex items-center justify-center text-white font-bold text-lg" style={{display: 'none'}}>
-                        {product.title.charAt(0)}
+                    {isGenerating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="w-5 h-5 mr-2" />
+                        Generate Design
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Product Options */}
+                {selectedProduct && selectedVariant && (
+                  <>
+                    {/* Color Selection */}
+                    {selectedVariant.options.some((opt: any) => opt.value.toLowerCase().includes('white') || opt.value.toLowerCase().includes('black') || opt.value.toLowerCase().includes('navy')) && (
+                      <div className="card">
+                        <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+                          <Palette className="w-6 h-6 mr-2 text-blue-600" />
+                          Choose Color
+                        </h2>
+                        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                          {selectedVariant.options.map((option: any) => (
+                            <button
+                              key={option.id}
+                              onClick={() => handleOptionChange('color', option.value)}
+                              className={`p-3 rounded-lg border-2 transition-all ${
+                                selectedOptions.color === option.value
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <div className="text-sm font-medium text-gray-900">{option.value}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Size Selection */}
+                    {selectedProduct.options.some((opt: any) => opt.name.toLowerCase().includes('size')) && (
+                      <div className="card">
+                        <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+                          <Ruler className="w-6 h-6 mr-2 text-blue-600" />
+                          Choose Size
+                        </h2>
+                        <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                          {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                            <button
+                              key={size}
+                              onClick={() => handleOptionChange('size', size)}
+                              className={`p-3 rounded-lg border-2 transition-all ${
+                                selectedOptions.size === size
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <div className="text-sm font-medium text-gray-900">{size}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Right Column - Generated Design and Tips */}
+              <div className="space-y-8">
+                {/* Your Generated Design */}
+                <div className="card">
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your Generated Design</h2>
+
+                  {/* Mockup View Selector */}
+                  {selectedProduct && getAvailableMockupViews().length > 1 && (
+                    <div className="mb-4">
+                      <div className="flex space-x-2">
+                        {getAvailableMockupViews().map((view: string) => (
+                          <button
+                            key={view}
+                            onClick={() => setSelectedMockupView(view)}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              selectedMockupView === view
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {view === 'front' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                            <span className="ml-1 capitalize">{view}</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-center mb-1">{product.title}</h3>
-                    <p className="text-blue-600 font-medium text-center">{getProductPricing(product.id).base.toFixed(2)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  )}
 
-            {/* Product Options */}
-            {selectedProduct && selectedVariant && (
-              <>
-                {/* Color Selection */}
-                {selectedVariant.options.some((opt: any) => opt.value.toLowerCase().includes('white') || opt.value.toLowerCase().includes('black') || opt.value.toLowerCase().includes('navy')) && (
-                  <div className="card">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <Palette className="w-6 h-6 mr-2 text-blue-600" />
-                      Choose Color
-                    </h2>
-                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                      {selectedVariant.options.map((option: any) => (
-                        <button
-                          key={option.id}
-                          onClick={() => handleOptionChange('color', option.value)}
-                          className={`p-3 rounded-lg border-2 transition-all ${
-                            selectedOptions.color === option.value 
-                              ? 'border-blue-500 bg-blue-50' 
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="text-sm font-medium text-gray-900">{option.value}</div>
-                        </button>
-                      ))}
-                    </div>
+                  <div className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden">
+                    {(() => {
+                      const mockupDisplay = getMockupDisplay()
+                      return (
+                        <>
+                          {/* Product Mockup Background */}
+                          <img 
+                            src={mockupDisplay.backgroundImage} 
+                            alt="Product mockup" 
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                          
+                          {/* Generated Design Overlay */}
+                          {mockupDisplay.overlayImage && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="relative w-3/4 h-3/4">
+                                <img 
+                                  src={mockupDisplay.overlayImage} 
+                                  alt="Generated design" 
+                                  className="w-full h-full object-contain rounded-lg shadow-lg"
+                                  style={{
+                                    mixBlendMode: 'multiply',
+                                    filter: 'contrast(1.1) brightness(1.05)'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Placeholder when no design generated */}
+                          {!mockupDisplay.overlayImage && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
+                              <div className="text-center text-white">
+                                <Wand2 className="w-12 h-12 mx-auto mb-2 text-white" />
+                                <p className="font-medium">Your design will appear here</p>
+                                <p className="text-sm opacity-80">Describe your vision and generate</p>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )
+                    })()}
                   </div>
-                )}
 
-                {/* Size Selection */}
-                {selectedProduct.options.some((opt: any) => opt.name.toLowerCase().includes('size')) && (
-                  <div className="card">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <Ruler className="w-6 h-6 mr-2 text-blue-600" />
-                      Choose Size
-                    </h2>
-                    <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                      {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
-                        <button
-                          key={size}
-                          onClick={() => handleOptionChange('size', size)}
-                          className={`p-3 rounded-lg border-2 transition-all ${
-                            selectedOptions.size === size 
-                              ? 'border-blue-500 bg-blue-50' 
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="text-sm font-medium text-gray-900">{size}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Right Column - Generated Design and Tips */}
-          <div className="space-y-8">
-            {/* Your Generated Design */}
-            <div className="card">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your Generated Design</h2>
-              
-              {/* Mockup View Selector */}
-              {selectedProduct && getAvailableMockupViews().length > 1 && (
-                <div className="mb-4">
-                  <div className="flex space-x-2">
-                                         {getAvailableMockupViews().map((view: string) => (
-                      <button
-                        key={view}
-                        onClick={() => setSelectedMockupView(view)}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          selectedMockupView === view
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {view === 'front' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                        <span className="ml-1 capitalize">{view}</span>
+                  {generatedImage && (
+                    <div className="mt-4 space-y-3">
+                      <button className="w-full btn-primary">
+                        Add to Cart - {getProductPrice()}
                       </button>
-                    ))}
-                  </div>
+                      <button className="w-full btn-secondary">
+                        Generate Another Design
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-              
-              <div className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden">
-                {(() => {
-                  const mockupDisplay = getMockupDisplay()
-                  return (
-                    <>
-                      {/* Product Mockup Background */}
-                      <img 
-                        src={mockupDisplay.backgroundImage} 
-                        alt="Product mockup" 
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      
-                      {/* Generated Design Overlay */}
-                      {mockupDisplay.overlayImage && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="relative w-3/4 h-3/4">
-                            <img 
-                              src={mockupDisplay.overlayImage} 
-                              alt="Generated design" 
-                              className="w-full h-full object-contain rounded-lg shadow-lg"
-                              style={{
-                                mixBlendMode: 'multiply',
-                                filter: 'contrast(1.1) brightness(1.05)'
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Placeholder when no design generated */}
-                      {!mockupDisplay.overlayImage && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
-                          <div className="text-center text-white">
-                            <Wand2 className="w-12 h-12 mx-auto mb-2 text-white" />
-                            <p className="font-medium">Your design will appear here</p>
-                            <p className="text-sm opacity-80">Select a product and generate your design</p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )
-                })()}
-              </div>
-              
-              {generatedImage && (
-                <div className="mt-4 space-y-3">
-                  <button className="w-full btn-primary">
-                    Add to Cart - {getProductPrice()}
-                  </button>
-                  <button className="w-full btn-secondary">
-                    Generate Another Design
-                  </button>
-                </div>
-              )}
-            </div>
 
-            {/* Design Tips */}
-            <div className="card bg-blue-50 border-blue-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
-                </svg>
-                Design Tips
-              </h2>
-              <ul className="space-y-2 text-gray-700">
-                <li>• Be specific about style, colors, and mood</li>
-                <li>• Include details like 'vintage,' 'minimalist,' or 'cyberpunk'</li>
-                <li>• Mention specific elements you want to see</li>
-                <li>• Try different prompts to get varied results</li>
-              </ul>
+                {/* Design Tips */}
+                <div className="card bg-blue-50 border-blue-200">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+                    </svg>
+                    Design Tips
+                  </h2>
+                  <ul className="space-y-2 text-gray-700">
+                    <li>• Be specific about style, colors, and mood</li>
+                    <li>• Include details like 'vintage,' 'minimalist,' or 'cyberpunk'</li>
+                    <li>• Mention specific elements you want to see</li>
+                    <li>• Try different prompts to get varied results</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
