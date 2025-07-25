@@ -1,95 +1,62 @@
-import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, Star, ShoppingBag } from 'lucide-react'
+import { ArrowRight, Star, Truck, Shield } from 'lucide-react'
 
 const products = [
   {
     id: 'tshirt',
-    name: 'T-Shirts',
-    description: 'Premium cotton t-shirts with your AI-generated designs',
+    name: 'Premium Cotton T-Shirt',
     price: '$24.95',
-    icon: '👕',
-    features: ['100% Cotton', 'Multiple sizes', 'Fast shipping', 'Premium print quality'],
-    colors: ['White', 'Black', 'Navy', 'Gray'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    image: '/api/placeholder/400/300?text=T-Shirt+Design'
+    image: '/images/tshirt-product.jpg',
+    description: 'High-quality 100% cotton t-shirt with your custom design',
+    features: ['100% Cotton', 'Multiple sizes', 'Machine washable', 'Custom fit'],
+    colors: ['White', 'Black', 'Navy', 'Gray', 'Red', 'Green'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
   },
   {
     id: 'hoodie',
-    name: 'Hoodies',
-    description: 'Comfortable hoodies perfect for showcasing your unique designs',
+    name: 'Comfortable Hoodie',
     price: '$39.95',
-    icon: '🧥',
-    features: ['Fleece-lined', 'Kangaroo pocket', 'Drawstring hood', 'Durable print'],
-    colors: ['Black', 'Gray', 'Navy', 'Burgundy'],
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    image: '/api/placeholder/400/300?text=Hoodie+Design'
+    image: '/images/hoodie-product.jpg',
+    description: 'Warm and cozy hoodie perfect for any season',
+    features: ['Fleece lining', 'Kangaroo pocket', 'Adjustable drawstring', 'Durable'],
+    colors: ['Black', 'Gray', 'Navy', 'Burgundy', 'Olive'],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL']
   },
   {
     id: 'mug',
-    name: 'Mugs',
-    description: 'Ceramic mugs that make every sip a statement',
+    name: 'Ceramic Coffee Mug',
     price: '$14.95',
-    icon: '☕',
-    features: ['11oz ceramic', 'Microwave safe', 'Dishwasher safe', 'Vibrant colors'],
-    colors: ['White', 'Black', 'Red', 'Blue'],
-    sizes: ['Standard'],
-    image: '/api/placeholder/400/300?text=Mug+Design'
+    image: '/images/mug-product.jpg',
+    description: 'Perfect for your morning coffee with a personal touch',
+    features: ['Microwave safe', 'Dishwasher safe', '11oz capacity', 'Lead-free'],
+    colors: ['White', 'Black', 'Red', 'Blue', 'Green']
   },
   {
     id: 'poster',
-    name: 'Posters',
-    description: 'High-quality posters perfect for home or office decor',
+    name: 'High-Quality Poster',
     price: '$19.95',
-    icon: '🖼️',
-    features: ['Premium paper', 'Multiple sizes', 'Fade resistant', 'Ready to frame'],
-    colors: ['Full color'],
-    sizes: ['8x10', '11x14', '16x20', '18x24'],
-    image: '/api/placeholder/400/300?text=Poster+Design'
+    image: '/images/poster-product.jpg',
+    description: 'Vibrant prints perfect for home or office decoration',
+    features: ['Premium paper', 'Fade resistant', 'Multiple sizes', 'Ready to frame'],
+    sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
   },
   {
     id: 'canvas',
-    name: 'Canvas Prints',
-    description: 'Gallery-quality canvas prints that bring your designs to life',
+    name: 'Gallery Canvas Print',
     price: '$29.95',
-    icon: '🎨',
-    features: ['Gallery wrapped', 'Museum quality', 'UV resistant', 'Ready to hang'],
-    colors: ['Full color'],
-    sizes: ['12x12', '16x16', '20x20', '24x24'],
-    image: '/api/placeholder/400/300?text=Canvas+Design'
+    image: '/images/canvas-product.jpg',
+    description: 'Museum-quality canvas prints that last a lifetime',
+    features: ['Gallery wrapped', 'UV resistant', 'Archival quality', 'Ready to hang'],
+    sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
   },
   {
     id: 'sticker',
-    name: 'Stickers',
-    description: 'High-quality vinyl stickers for laptops, water bottles, and more',
+    name: 'Vinyl Stickers',
     price: '$4.95',
-    icon: '🏷️',
-    features: ['Weather resistant', 'UV protected', 'Easy to apply', 'Removable'],
-    colors: ['Full color'],
-    sizes: ['3x3', '4x4', '5x5'],
-    image: '/api/placeholder/400/300?text=Sticker+Design'
-  },
-  {
-    id: 'tote',
-    name: 'Tote Bags',
-    description: 'Eco-friendly tote bags with your personalized designs',
-    price: '$19.95',
-    icon: '👜',
-    features: ['Cotton canvas', 'Reinforced handles', 'Washable', 'Eco-friendly'],
-    colors: ['Natural', 'Black', 'Navy'],
-    sizes: ['Standard'],
-    image: '/api/placeholder/400/300?text=Tote+Design'
-  },
-  {
-    id: 'phonecase',
-    name: 'Phone Cases',
-    description: 'Protective phone cases featuring your AI-generated artwork',
-    price: '$24.95',
-    icon: '📱',
-    features: ['Drop protection', 'Precise cutouts', 'Slim design', 'Scratch resistant'],
-    colors: ['Clear', 'Black', 'White'],
-    sizes: ['iPhone 13', 'iPhone 14', 'Samsung Galaxy', 'Google Pixel'],
-    image: '/api/placeholder/400/300?text=Phone+Case+Design'
+    image: '/images/sticker-product.jpg',
+    description: 'Durable vinyl stickers for laptops, water bottles, and more',
+    features: ['Weather resistant', 'Easy to apply', 'Removable', 'Long lasting'],
+    sizes: ['2" x 2"', '3" x 3"', '4" x 4"', '5" x 5"']
   }
 ]
 
@@ -97,166 +64,253 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <nav className="relative z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link href="/" className="text-gray-700 hover:text-blue-600">
-                ← Back to Home
+              <Link href="/" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white">
+                    <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"></path>
+                    <path d="m14 7 3 3"></path>
+                    <path d="M5 6v4"></path>
+                    <path d="M19 14v4"></path>
+                    <path d="M10 2v2"></path>
+                    <path d="M7 8H3"></path>
+                    <path d="M21 16h-4"></path>
+                    <path d="M11 3H9"></path>
+                  </svg>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">GenifyDesigns</span>
               </Link>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">G</span>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-4">
+                <Link href="/create" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Create Design</Link>
+                <Link href="/products" className="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Products</Link>
+                <Link href="/about" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</Link>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                GenifyDesigns
-              </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/create" className="btn-primary">Start Creating</Link>
             </div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Our Products
+      {/* Hero Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+            Our Product Collection
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Choose from our wide range of high-quality products. Each item is printed with your unique AI-generated design, 
-            ensuring you get a truly personalized product.
+          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+            From clothing to home decor, discover our range of high-quality products 
+            that can showcase your AI-generated designs.
           </p>
         </div>
+      </section>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {products.map((product) => (
-            <div key={product.id} className="card hover:shadow-lg transition-shadow">
-              <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <div className="text-6xl">{product.icon}</div>
-              </div>
-              
-              <div className="mb-4">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>
-                <p className="text-gray-600 mb-3">{product.description}</p>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-bold text-blue-600">{product.price}</span>
-                  <div className="flex items-center text-yellow-400">
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <span className="text-gray-600 text-sm ml-1">(4.9)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="mb-4">
-                <h4 className="font-medium text-gray-900 mb-2">Features:</h4>
-                <ul className="space-y-1">
-                  {product.features.map((feature, index) => (
-                    <li key={index} className="text-sm text-gray-600 flex items-center">
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></div>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Options */}
-              <div className="mb-6">
-                <div className="mb-3">
-                  <h4 className="font-medium text-gray-900 mb-2">Available Colors:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {product.colors.map((color, index) => (
-                      <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                        {color}
-                      </span>
-                    ))}
+      {/* Products Grid */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {products.map((product) => (
+              <div key={product.id} className="card hover:shadow-xl transition-shadow">
+                <div className="aspect-square bg-gray-100 rounded-lg mb-6 overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement
+                      target.style.display = 'none'
+                      const nextElement = target.nextElementSibling as HTMLElement
+                      if (nextElement) {
+                        nextElement.style.display = 'flex'
+                      }
+                    }}
+                  />
+                  <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl" style={{display: 'none'}}>
+                    {product.name.charAt(0)}
                   </div>
                 </div>
                 
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Available Sizes:</h4>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>
+                <p className="text-gray-600 mb-4">{product.description}</p>
+                
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-2xl font-bold text-blue-600">{product.price}</span>
+                  <div className="flex items-center text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-current" />
+                    ))}
+                    <span className="text-gray-600 text-sm ml-1">(4.9)</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <h4 className="font-semibold text-gray-900">Features:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {product.sizes.map((size, index) => (
-                      <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                        {size}
+                    {product.features.map((feature) => (
+                      <span key={feature} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        {feature}
                       </span>
                     ))}
                   </div>
                 </div>
+
+                {product.colors && (
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-gray-900 mb-2">Available Colors:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {product.colors.map((color) => (
+                        <span key={color} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                          {color}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {product.sizes && (
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-900 mb-2">Available Sizes:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {product.sizes.map((size) => (
+                        <span key={size} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <Link 
+                  href={`/create?product=${product.id}`}
+                  className="w-full btn-primary flex items-center justify-center"
+                >
+                  Create Design
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
               </div>
-
-              {/* CTA */}
-              <Link 
-                href={`/create?product=${product.id}`}
-                className="btn-primary w-full flex items-center justify-center"
-              >
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Create Design
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* CTA Section */}
-        <div className="text-center bg-white rounded-xl p-8 shadow-sm border border-gray-200">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Ready to Create Something Amazing?
-          </h2>
-          <p className="text-xl text-gray-600 mb-6">
-            Choose your product and let our AI bring your ideas to life
-          </p>
-          <Link href="/create" className="btn-primary text-lg px-8 py-4 inline-flex items-center">
-            Start Creating Now
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
-            Frequently Asked Questions
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How does the AI design generation work?</h3>
+      {/* Features Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Our Products?</h2>
+            <p className="text-xl text-gray-600">Quality, durability, and style in every item</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Premium Quality</h3>
               <p className="text-gray-600">
-                Simply describe what you want to see in plain English. Our AI will instantly create a unique design based on your description, 
-                which you can then apply to any of our products.
+                All our products are made with the highest quality materials, 
+                ensuring durability and comfort.
               </p>
             </div>
             
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">What's the quality of the products?</h3>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Truck className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Fast Shipping</h3>
               <p className="text-gray-600">
-                We use premium materials and high-quality printing processes. All products are made to last and come with our quality guarantee.
+                Get your custom products delivered to your door within 3-5 business days.
               </p>
             </div>
             
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How long does shipping take?</h3>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Star className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Customer Satisfaction</h3>
               <p className="text-gray-600">
-                Most orders ship within 2-3 business days. Delivery typically takes 5-7 business days in the US, 
-                with expedited shipping options available.
-              </p>
-            </div>
-            
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Can I return my order?</h3>
-              <p className="text-gray-600">
-                Yes! We offer a 30-day return policy for all products. If you're not satisfied, 
-                we'll provide a full refund or replacement.
+                Join thousands of satisfied customers who love their custom designs.
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-white mb-6">Ready to Create Something Amazing?</h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Choose your product and start designing with AI today
+          </p>
+          <Link href="/create" className="inline-flex items-center bg-white text-blue-600 font-semibold py-4 px-8 rounded-lg hover:bg-gray-100 transition-colors text-lg">
+            Start Creating Now
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white">
+                    <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"></path>
+                    <path d="m14 7 3 3"></path>
+                    <path d="M5 6v4"></path>
+                    <path d="M19 14v4"></path>
+                    <path d="M10 2v2"></path>
+                    <path d="M7 8H3"></path>
+                    <path d="M21 16h-4"></path>
+                    <path d="M11 3H9"></path>
+                  </svg>
+                </div>
+                <span className="text-xl font-bold">GenifyDesigns</span>
+              </div>
+              <p className="text-gray-400">AI-powered print-on-demand platform for creative expression.</p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Products</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/products#tshirt" className="hover:text-white transition-colors">T-Shirts</Link></li>
+                <li><Link href="/products#hoodie" className="hover:text-white transition-colors">Hoodies</Link></li>
+                <li><Link href="/products#mug" className="hover:text-white transition-colors">Mugs</Link></li>
+                <li><Link href="/products#poster" className="hover:text-white transition-colors">Posters</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link href="/shipping" className="hover:text-white transition-colors">Shipping Info</Link></li>
+                <li><Link href="/returns" className="hover:text-white transition-colors">Returns</Link></li>
+                <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>© 2024 GenifyDesigns. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 } 
