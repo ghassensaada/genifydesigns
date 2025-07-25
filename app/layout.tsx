@@ -15,6 +15,14 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code',
   },
+  icons: {
+    icon: [
+      {
+        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0idXJsKCNncmFkaWVudCkiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI2IiB5PSI2Ij4KPHBhdGggZD0ibTIxLjY0IDMuNjQtMS4yOC0xLjI4YTEuMjEgMS4yMSAwIDAgMC0xLjcyIDBMMi4zNiAxOC42NGExLjIxIDEuMjEgMCAwIDAgMCAxLjcybDEuMjggMS4yOGExLjIgMS4yIDAgMCAwIDEuNzIgMEwyMS42NCA1LjM2YTEuMiAxLjIgMCAwIDAgMC0xLjcyWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0ibTE0IDcgMyAzIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNSA2djQiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xOSAxNHY0IiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTAgMnYyIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNyA4SDMiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMSAxNmg0IiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTEgM0g5IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2N0VFQSIvPgo8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3NjRCQTIiLz4KPC9zdmc+',
+        type: 'image/svg+xml',
+      },
+    ],
+  },
   openGraph: {
     title: 'GenifyDesigns - AI-Powered Print-on-Demand',
     description: 'Turn your ideas into unique, wearable, giftable, or display-worthy designs instantly.',
@@ -50,6 +58,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0idXJsKCNncmFkaWVudCkiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI2IiB5PSI2Ij4KPHBhdGggZD0ibTIxLjY0IDMuNjQtMS4yOC0xLjI4YTEuMjEgMS4yMSAwIDAgMC0xLjcyIDBMMi4zNiAxOC42NGExLjIxIDEuMjEgMCAwIDAgMCAxLjcybDEuMjggMS4yOGExLjIgMS4yIDAgMCAwIDEuNzIgMEwyMS42NCA1LjM2YTEuMiAxLjIgMCAwIDAgMC0xLjcyWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0ibTE0IDcgMyAzIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNSA2djQiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xOSAxNHY0IiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTAgMnYyIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNyA4SDMiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMSAxNmg0IiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTEgM0g5IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2N0VFQSIvPgo8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3NjRCQTIiLz4KPC9zdmc+" />
       </head>
       <body className={inter.className}>
         {children}
