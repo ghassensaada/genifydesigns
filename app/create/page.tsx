@@ -1,56 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Wand2, Palette, Ruler } from 'lucide-react'
+import { ArrowLeft, Wand2, Palette, Ruler, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
-
-const products = [
-  {
-    id: 'tshirt',
-    name: 'T-Shirt',
-    price: '$24.95',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop&crop=center',
-    colors: ['White', 'Black', 'Navy', 'Gray', 'Red', 'Green'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-  },
-  {
-    id: 'hoodie',
-    name: 'Hoodie',
-    price: '$39.95',
-    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop&crop=center',
-    colors: ['Black', 'Gray', 'Navy', 'Burgundy', 'Olive'],
-    sizes: ['S', 'M', 'L', 'XL', 'XXL']
-  },
-  {
-    id: 'mug',
-    name: 'Mug',
-    price: '$14.95',
-    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop&crop=center',
-    colors: ['White', 'Black', 'Red', 'Blue', 'Green']
-  },
-  {
-    id: 'poster',
-    name: 'Poster',
-    price: '$19.95',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=center',
-    sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
-  },
-  {
-    id: 'canvas',
-    name: 'Canvas Print',
-    price: '$29.95',
-    image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop&crop=center',
-    sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
-  },
-  {
-    id: 'sticker',
-    name: 'Sticker',
-    price: '$4.95',
-    image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop&crop=center',
-    sizes: ['2" x 2"', '3" x 3"', '4" x 4"', '5" x 5"']
-  }
-]
+import { getPrintifyProducts, getProductPricing, type PrintifyProduct } from '@/lib/printify'
 
 const suggestedPrompts = [
   'A flamingo DJ in retro style',
@@ -65,11 +19,34 @@ const suggestedPrompts = [
 
 export default function CreatePage() {
   const [prompt, setPrompt] = useState('')
-  const [selectedProduct, setSelectedProduct] = useState(products[0])
-  const [selectedColor, setSelectedColor] = useState('')
-  const [selectedSize, setSelectedSize] = useState('')
+  const [products, setProducts] = useState<PrintifyProduct[]>([])
+  const [selectedProduct, setSelectedProduct] = useState<PrintifyProduct | null>(null)
+  const [selectedVariant, setSelectedVariant] = useState<any>(null)
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, any>>({})
+  const [selectedMockupView, setSelectedMockupView] = useState('front')
   const [generatedImage, setGeneratedImage] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    loadProducts()
+  }, [])
+
+  const loadProducts = async () => {
+    try {
+      const printifyProducts = await getPrintifyProducts()
+      setProducts(printifyProducts)
+      if (printifyProducts.length > 0) {
+        setSelectedProduct(printifyProducts[0])
+        setSelectedVariant(printifyProducts[0].variants[0])
+      }
+    } catch (error) {
+      console.error('Error loading products:', error)
+      toast.error('Failed to load products')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -103,20 +80,53 @@ export default function CreatePage() {
     }
   }
 
-  const handleProductSelect = (product: typeof products[0]) => {
+  const handleProductSelect = (product: PrintifyProduct) => {
     setSelectedProduct(product)
-    setSelectedColor('')
-    setSelectedSize('')
+    setSelectedVariant(product.variants[0])
+    setSelectedOptions({})
+    setSelectedMockupView('front')
+  }
+
+  const handleOptionChange = (optionName: string, value: any) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [optionName]: value
+    }))
   }
 
   const getMockupImage = () => {
-    if (!generatedImage) {
+    if (!selectedProduct || !selectedVariant) {
       return 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center'
     }
     
-    // In a real implementation, you would overlay the generated design on the product mockup
-    // For now, we'll use the generated image directly
-    return generatedImage
+    const placeholder = selectedVariant.placeholders.find((p: any) => p.position === selectedMockupView)
+    if (placeholder && placeholder.images.length > 0) {
+      return placeholder.images[0].src
+    }
+    
+    return selectedProduct.images[0] || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center'
+  }
+
+  const getAvailableMockupViews = () => {
+    if (!selectedVariant) return []
+    return selectedVariant.placeholders.map((p: any) => p.position)
+  }
+
+  const getProductPrice = () => {
+    if (!selectedProduct) return '$0.00'
+    const pricing = getProductPricing(selectedProduct.id)
+    return `$${pricing.base.toFixed(2)}`
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -216,83 +226,87 @@ export default function CreatePage() {
                     key={product.id}
                     onClick={() => handleProductSelect(product)}
                     className={`card cursor-pointer transition-all hover:shadow-lg ${
-                      selectedProduct.id === product.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                      selectedProduct?.id === product.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''
                     }`}
                   >
                     <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
-                                             <img 
-                         src={product.image} 
-                         alt={product.name}
-                         className="w-12 h-12 object-cover rounded"
-                         onError={(e) => {
-                           // Fallback to a simple icon if image fails to load
-                           const target = e.currentTarget as HTMLImageElement
-                           target.style.display = 'none'
-                           const nextElement = target.nextElementSibling as HTMLElement
-                           if (nextElement) {
-                             nextElement.style.display = 'block'
-                           }
-                         }}
-                       />
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.title}
+                        className="w-12 h-12 object-cover rounded"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement
+                          target.style.display = 'none'
+                          const nextElement = target.nextElementSibling as HTMLElement
+                          if (nextElement) {
+                            nextElement.style.display = 'block'
+                          }
+                        }}
+                      />
                       <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded flex items-center justify-center text-white font-bold text-lg" style={{display: 'none'}}>
-                        {product.name.charAt(0)}
+                        {product.title.charAt(0)}
                       </div>
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-center mb-1">{product.name}</h3>
-                    <p className="text-blue-600 font-medium text-center">{product.price}</p>
+                    <h3 className="font-semibold text-gray-900 text-center mb-1">{product.title}</h3>
+                    <p className="text-blue-600 font-medium text-center">{getProductPricing(product.id).base.toFixed(2)}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Color Selection */}
-            {selectedProduct.colors && (
-              <div className="card">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
-                  <Palette className="w-6 h-6 mr-2 text-blue-600" />
-                  Choose Color
-                </h2>
-                <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                  {selectedProduct.colors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`p-3 rounded-lg border-2 transition-all ${
-                        selectedColor === color 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="text-sm font-medium text-gray-900">{color}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Product Options */}
+            {selectedProduct && selectedVariant && (
+              <>
+                {/* Color Selection */}
+                {selectedVariant.options.some((opt: any) => opt.value.toLowerCase().includes('white') || opt.value.toLowerCase().includes('black') || opt.value.toLowerCase().includes('navy')) && (
+                  <div className="card">
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+                      <Palette className="w-6 h-6 mr-2 text-blue-600" />
+                      Choose Color
+                    </h2>
+                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                      {selectedVariant.options.map((option: any) => (
+                        <button
+                          key={option.id}
+                          onClick={() => handleOptionChange('color', option.value)}
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            selectedOptions.color === option.value 
+                              ? 'border-blue-500 bg-blue-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="text-sm font-medium text-gray-900">{option.value}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* Size Selection */}
-            {selectedProduct.sizes && (
-              <div className="card">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
-                  <Ruler className="w-6 h-6 mr-2 text-blue-600" />
-                  Choose Size
-                </h2>
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                  {selectedProduct.sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`p-3 rounded-lg border-2 transition-all ${
-                        selectedSize === size 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="text-sm font-medium text-gray-900">{size}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+                {/* Size Selection */}
+                {selectedProduct.options.some((opt: any) => opt.name.toLowerCase().includes('size')) && (
+                  <div className="card">
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+                      <Ruler className="w-6 h-6 mr-2 text-blue-600" />
+                      Choose Size
+                    </h2>
+                    <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                      {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => handleOptionChange('size', size)}
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            selectedOptions.size === size 
+                              ? 'border-blue-500 bg-blue-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="text-sm font-medium text-gray-900">{size}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -301,6 +315,29 @@ export default function CreatePage() {
             {/* Your Generated Design */}
             <div className="card">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your Generated Design</h2>
+              
+              {/* Mockup View Selector */}
+              {selectedProduct && getAvailableMockupViews().length > 1 && (
+                <div className="mb-4">
+                  <div className="flex space-x-2">
+                                         {getAvailableMockupViews().map((view: string) => (
+                      <button
+                        key={view}
+                        onClick={() => setSelectedMockupView(view)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          selectedMockupView === view
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {view === 'front' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        <span className="ml-1 capitalize">{view}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                 {generatedImage ? (
                   <img 
@@ -319,7 +356,7 @@ export default function CreatePage() {
               {generatedImage && (
                 <div className="mt-4 space-y-3">
                   <button className="w-full btn-primary">
-                    Add to Cart - {selectedProduct.price}
+                    Add to Cart - {getProductPrice()}
                   </button>
                   <button className="w-full btn-secondary">
                     Generate Another Design

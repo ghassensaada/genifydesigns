@@ -1,68 +1,79 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Star, Truck, Shield } from 'lucide-react'
-
-const products = [
-  {
-    id: 'tshirt',
-    name: 'Premium Cotton T-Shirt',
-    price: '$24.95',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop&crop=center',
-    description: 'High-quality 100% cotton t-shirt with your custom design',
-    features: ['100% Cotton', 'Multiple sizes', 'Machine washable', 'Custom fit'],
-    colors: ['White', 'Black', 'Navy', 'Gray', 'Red', 'Green'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-  },
-  {
-    id: 'hoodie',
-    name: 'Comfortable Hoodie',
-    price: '$39.95',
-    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop&crop=center',
-    description: 'Warm and cozy hoodie perfect for any season',
-    features: ['Fleece lining', 'Kangaroo pocket', 'Adjustable drawstring', 'Durable'],
-    colors: ['Black', 'Gray', 'Navy', 'Burgundy', 'Olive'],
-    sizes: ['S', 'M', 'L', 'XL', 'XXL']
-  },
-  {
-    id: 'mug',
-    name: 'Ceramic Coffee Mug',
-    price: '$14.95',
-    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop&crop=center',
-    description: 'Perfect for your morning coffee with a personal touch',
-    features: ['Microwave safe', 'Dishwasher safe', '11oz capacity', 'Lead-free'],
-    colors: ['White', 'Black', 'Red', 'Blue', 'Green']
-  },
-  {
-    id: 'poster',
-    name: 'High-Quality Poster',
-    price: '$19.95',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=center',
-    description: 'Vibrant prints perfect for home or office decoration',
-    features: ['Premium paper', 'Fade resistant', 'Multiple sizes', 'Ready to frame'],
-    sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
-  },
-  {
-    id: 'canvas',
-    name: 'Gallery Canvas Print',
-    price: '$29.95',
-    image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop&crop=center',
-    description: 'Museum-quality canvas prints that last a lifetime',
-    features: ['Gallery wrapped', 'UV resistant', 'Archival quality', 'Ready to hang'],
-    sizes: ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
-  },
-  {
-    id: 'sticker',
-    name: 'Vinyl Stickers',
-    price: '$4.95',
-    image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop&crop=center',
-    description: 'Durable vinyl stickers for laptops, water bottles, and more',
-    features: ['Weather resistant', 'Easy to apply', 'Removable', 'Long lasting'],
-    sizes: ['2" x 2"', '3" x 3"', '4" x 4"', '5" x 5"']
-  }
-]
+import { getPrintifyProducts, getProductPricing, type PrintifyProduct } from '@/lib/printify'
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState<PrintifyProduct[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    loadProducts()
+  }, [])
+
+  const loadProducts = async () => {
+    try {
+      const printifyProducts = await getPrintifyProducts()
+      setProducts(printifyProducts)
+    } catch (error) {
+      console.error('Error loading products:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getProductFeatures = (product: PrintifyProduct) => {
+    const features: string[] = []
+    
+    // Add features based on product type
+    if (product.title.toLowerCase().includes('t-shirt')) {
+      features.push('100% Cotton', 'Multiple sizes', 'Machine washable', 'Custom fit')
+    } else if (product.title.toLowerCase().includes('hoodie')) {
+      features.push('Fleece lining', 'Kangaroo pocket', 'Adjustable drawstring', 'Durable')
+    } else if (product.title.toLowerCase().includes('mug')) {
+      features.push('Microwave safe', 'Dishwasher safe', '11oz capacity', 'Lead-free')
+    } else if (product.title.toLowerCase().includes('poster')) {
+      features.push('Premium paper', 'Fade resistant', 'Multiple sizes', 'Ready to frame')
+    } else if (product.title.toLowerCase().includes('canvas')) {
+      features.push('Gallery wrapped', 'UV resistant', 'Archival quality', 'Ready to hang')
+    } else if (product.title.toLowerCase().includes('sticker')) {
+      features.push('Weather resistant', 'Easy to apply', 'Removable', 'Long lasting')
+    }
+    
+    return features
+  }
+
+  const getProductColors = (product: PrintifyProduct) => {
+    if (product.variants && product.variants[0] && product.variants[0].options) {
+      return product.variants[0].options.map((opt: any) => opt.value)
+    }
+    return []
+  }
+
+  const getProductSizes = (product: PrintifyProduct) => {
+    if (product.title.toLowerCase().includes('t-shirt') || product.title.toLowerCase().includes('hoodie')) {
+      return ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+    } else if (product.title.toLowerCase().includes('poster') || product.title.toLowerCase().includes('canvas')) {
+      return ['8" x 10"', '11" x 14"', '16" x 20"', '18" x 24"', '24" x 36"']
+    } else if (product.title.toLowerCase().includes('sticker')) {
+      return ['2" x 2"', '3" x 3"', '4" x 4"', '5" x 5"']
+    }
+    return []
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Navigation */}
@@ -121,8 +132,8 @@ export default function ProductsPage() {
               <div key={product.id} className="card hover:shadow-xl transition-shadow">
                 <div className="aspect-square bg-gray-100 rounded-lg mb-6 overflow-hidden">
                   <img 
-                    src={product.image} 
-                    alt={product.name}
+                    src={product.images[0]} 
+                    alt={product.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.currentTarget as HTMLImageElement
@@ -134,15 +145,15 @@ export default function ProductsPage() {
                     }}
                   />
                   <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl" style={{display: 'none'}}>
-                    {product.name.charAt(0)}
+                    {product.title.charAt(0)}
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.title}</h3>
                 <p className="text-gray-600 mb-4">{product.description}</p>
                 
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-bold text-blue-600">{product.price}</span>
+                  <span className="text-2xl font-bold text-blue-600">${getProductPricing(product.id).base.toFixed(2)}</span>
                   <div className="flex items-center text-yellow-400">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-current" />
@@ -154,7 +165,7 @@ export default function ProductsPage() {
                 <div className="space-y-3 mb-6">
                   <h4 className="font-semibold text-gray-900">Features:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {product.features.map((feature) => (
+                    {getProductFeatures(product).map((feature) => (
                       <span key={feature} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                         {feature}
                       </span>
@@ -162,11 +173,11 @@ export default function ProductsPage() {
                   </div>
                 </div>
 
-                {product.colors && (
+                {getProductColors(product).length > 0 && (
                   <div className="mb-4">
                     <h4 className="font-semibold text-gray-900 mb-2">Available Colors:</h4>
                     <div className="flex flex-wrap gap-2">
-                      {product.colors.map((color) => (
+                      {getProductColors(product).map((color) => (
                         <span key={color} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
                           {color}
                         </span>
@@ -175,11 +186,11 @@ export default function ProductsPage() {
                   </div>
                 )}
 
-                {product.sizes && (
+                {getProductSizes(product).length > 0 && (
                   <div className="mb-6">
                     <h4 className="font-semibold text-gray-900 mb-2">Available Sizes:</h4>
                     <div className="flex flex-wrap gap-2">
-                      {product.sizes.map((size) => (
+                      {getProductSizes(product).map((size) => (
                         <span key={size} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
                           {size}
                         </span>
