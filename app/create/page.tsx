@@ -107,6 +107,25 @@ export default function CreatePage() {
     return selectedProduct.images[0] || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center'
   }
 
+  const getMockupDisplay = () => {
+    if (!selectedProduct || !selectedVariant) {
+      return {
+        backgroundImage: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center',
+        overlayImage: null
+      }
+    }
+    
+    const placeholder = selectedVariant.placeholders.find((p: any) => p.position === selectedMockupView)
+    const mockupImage = placeholder && placeholder.images.length > 0 
+      ? placeholder.images[0].src 
+      : selectedProduct.images[0]
+    
+    return {
+      backgroundImage: mockupImage,
+      overlayImage: generatedImage
+    }
+  }
+
   const getAvailableMockupViews = () => {
     if (!selectedVariant) return []
     return selectedVariant.placeholders.map((p: any) => p.position)
@@ -338,19 +357,48 @@ export default function CreatePage() {
                 </div>
               )}
               
-              <div className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                {generatedImage ? (
-                  <img 
-                    src={getMockupImage()} 
-                    alt="Generated design" 
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                ) : (
-                  <div className="text-center text-gray-500">
-                    <Wand2 className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                    <p>Your design will appear here</p>
-                  </div>
-                )}
+              <div className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden">
+                {(() => {
+                  const mockupDisplay = getMockupDisplay()
+                  return (
+                    <>
+                      {/* Product Mockup Background */}
+                      <img 
+                        src={mockupDisplay.backgroundImage} 
+                        alt="Product mockup" 
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      
+                      {/* Generated Design Overlay */}
+                      {mockupDisplay.overlayImage && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="relative w-3/4 h-3/4">
+                            <img 
+                              src={mockupDisplay.overlayImage} 
+                              alt="Generated design" 
+                              className="w-full h-full object-contain rounded-lg shadow-lg"
+                              style={{
+                                mixBlendMode: 'multiply',
+                                filter: 'contrast(1.1) brightness(1.05)'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Placeholder when no design generated */}
+                      {!mockupDisplay.overlayImage && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
+                          <div className="text-center text-white">
+                            <Wand2 className="w-12 h-12 mx-auto mb-2 text-white" />
+                            <p className="font-medium">Your design will appear here</p>
+                            <p className="text-sm opacity-80">Select a product and generate your design</p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )
+                })()}
               </div>
               
               {generatedImage && (
